@@ -40,14 +40,12 @@ main =
       , g
         [ id "closedStrings", transform "translate(1,12)" ]
         [ circle [ r "6", fill "#333", transform "translate(0,20)"] []
-        , circle [ r "6", fill "#333", transform "translate(40,20)"] []
-        , circle [ r "6", fill "#333", transform "translate(60,0)"] []
-        , circle [ r "6", fill "#333", transform "translate(20,40)"] []
+        , circle [ r "6", fill "#333", transform "translate(40,0)"] []
         ]
       , g
         [ id "openStrings", transform "translate(1,-5)" ]
         [ circle
-          [ cx "40"
+          [ cx "20"
           , r "4"
           , fill "none"
           , stroke "#333"
