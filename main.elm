@@ -13,7 +13,7 @@ import Svg.Attributes exposing (cx, fill, height, id, r, stroke, strokeWidth, te
 
 
 main =
-    Browser.element
+    Browser.document
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -128,9 +128,10 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    div []
+    { title = "Uke Chord Viewer"
+    , body =
         [ h1 [] [ Html.text "Chord Viewer" ]
         , ukeChord model.chord
         , select
@@ -143,6 +144,7 @@ view model =
             ]
         , p [] [ model.chord |> chordToList |> Debug.toString |> Html.text ]
         ]
+    }
 
 
 
@@ -173,8 +175,9 @@ ukeFret index fret =
 ukeSvg : String -> List Int -> Html msg
 ukeSvg name chordList =
     svg
-        [ width "84"
-        , height "130"
+        -- scale the SVG
+        [ floor (84 * 1.7) |> String.fromInt |> width
+        , floor (130 * 1.7) |> String.fromInt |> height
         , viewBox "0 0 84 130"
         , Svg.Attributes.style "font-family: sans-serif; font-size: 11px;"
         ]
