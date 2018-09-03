@@ -2,7 +2,11 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, div, h1, h2, option, p, select, text)
-import Html.Attributes exposing (value)
+import Html
+import Css exposing (..)
+-- import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (css)
+import Html.Attributes exposing (value, class)
 import Html.Events exposing (onInput)
 import Svg exposing (Svg, circle, g, rect, svg, text_)
 import Svg.Attributes exposing (cx, fill, height, id, r, stroke, strokeWidth, textAnchor, transform, viewBox, width, x, y)
@@ -132,17 +136,21 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "Uke Chord Viewer"
     , body =
-        [ h1 [] [ Html.text "Chord Viewer" ]
-        , ukeChord model.chord
-        , select
-            [ onInput ChangeChord ]
-            [ option [ value "NONE" ] [ Html.text "No Chord" ]
-            , option [ value "C" ] [ Html.text "C chord" ]
-            , option [ value "F" ] [ Html.text "F chord" ]
-            , option [ value "G" ] [ Html.text "G chord" ]
-            , option [ value "G7" ] [ Html.text "G7 chord" ]
+        [ div [
             ]
-        , p [] [ model.chord |> chordToList |> Debug.toString |> Html.text ]
+            [
+            h1 [] [ Html.text "Chord Viewer" ]
+            , div [] [ ukeChord model.chord ]
+            , select
+                [ onInput ChangeChord ]
+                [ option [ value "NONE" ] [ Html.text "No Chord" ]
+                , option [ value "C" ] [ Html.text "C chord" ]
+                , option [ value "F" ] [ Html.text "F chord" ]
+                , option [ value "G" ] [ Html.text "G chord" ]
+                , option [ value "G7" ] [ Html.text "G7 chord" ]
+                ]
+            -- , p [] [ model.chord |> chordToList |> Debug.toString |> Html.text ]
+            ]
         ]
     }
 
