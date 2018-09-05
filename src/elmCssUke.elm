@@ -138,15 +138,19 @@ view model =
             [ div
                 [ css
                     [ padding (em 1)
-                    , margin auto
+                    , borderRadius (px 5)
+                    , marginTop (em 5)
+                    , marginLeft auto
+                    , marginRight auto
+                    , border3 (px 2) solid (hex "777")
                     , textAlign center
-                    , maxWidth (em 45)
+                    , maxWidth (em 30)
                     , fontFamilies [ "Roboto", "Open Sans", "sans-serif" ]
                     , color (hex "222")
                     , backgroundColor (hex "F4EEE2")
                     ]
                 ]
-                [ h1 [] [ Html.Styled.text "Chord Viewer" ]
+                [ h1 [] [ Html.Styled.text "Uke Chord Viewer" ]
                 , div [] [ ukeChord model.chord ]
                 , select
                     [ onInput ChangeChord ]
@@ -156,7 +160,7 @@ view model =
                     , option [ value "G" ] [ Html.Styled.text "G chord" ]
                     , option [ value "G7" ] [ Html.Styled.text "G7 chord" ]
                     ]
-                , p [] [ model.chord |> chordToList |> Debug.toString |> Html.Styled.text ]
+                -- , p [] [ model.chord |> chordToList |> Debug.toString |> Html.Styled.text ]
                 ]
             ]
     }
