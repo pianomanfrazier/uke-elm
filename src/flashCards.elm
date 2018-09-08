@@ -17,34 +17,24 @@ main =
             ]
             [ g
                 [ id "svgFlashCard" ]
-                [ g
-                    [ id "lines", transform "translate(0,2)" ]
-                    (List.map staffLine [ 1, 2, 3, 4, 5 ])
-                , g
-                    [ id "clef", transform "translate(0,2)" ]
-                    [ trebleCleff
-                    ]
-                , g
-                    [ id "note", transform ("translate(14," ++ String.fromInt (3 - 1) ++ ")") ]
-                    [ noteHead
-                    , noteStem
-                    ]
-                ]
+                (drawNoteOnStaff D3 NoAccidental Alto)
             ]
         )
 
+
 type alias Config =
-    { color: String
+    { color : String
     }
 
+
 config =
-    { color = "#222" 
+    { color = "#222"
     , hoverColor = "rgba(0,0,0,0.3)"
     }
 
 
-trebleCleff : Html msg
-trebleCleff =
+trebleClef : Html msg
+trebleClef =
     Svg.path
         [ d """M376 262c4 0 9 1 13 1c155 0 256 -128 256 -261c0 -76 -33 -154 -107 -210c-22 -17 -47 -28 -73 -36c3 -35 5 -70 5 -105c0 -19 -1 -39 -2 -58c-7 -120 -90 -228 -208 -228c-108 0 -195 88 -195 197c0 58 53 103 112 103c54 0 95 -47 95 -103c0 -52 -43 -95 -95 -95
 c-11 0 -21 2 -31 6c26 -39 68 -65 117 -65c96 0 157 92 163 191c1 18 2 37 2 55c0 31 -1 61 -4 92c-29 -5 -58 -8 -89 -8c-188 0 -333 172 -333 374c0 177 131 306 248 441c-19 62 -37 125 -45 190c-6 52 -7 104 -7 156c0 115 55 224 149 292c3 2 7 3 10 3c4 0 7 0 10 -3
@@ -55,6 +45,68 @@ c80 97 146 198 146 324c0 55 -4 79 -20 129z"""
         , transform "translate(8.8,4) scale(0.004, -0.004)"
         ]
         []
+
+
+bassClef : Html msg
+bassClef =
+    Svg.path
+        [ d """M557 -125c0 28 23 51 51 51s51 -23 51 -51s-23 -51 -51 -51s-51 23 -51 51zM557 125c0 28 23 51 51 51s51 -23 51 -51s-23 -51 -51 -51s-51 23 -51 51zM232 263c172 0 293 -88 293 -251c0 -263 -263 -414 -516 -521c-3 -3 -6 -4 -9 -4c-7 0 -13 6 -13 13c0 3 1 6 4 9 c202 118 412 265 412 493c0 120 -63 235 -171 235c-74 0 -129 -54 -154 -126c11 5 22 8 34 8c55 0 100 -45 100 -100c0 -58 -44 -106 -100 -106c-60 0 -112 47 -112 106c0 133 102 244 232 244z"""
+        , fill config.color
+        , transform "translate(8.8,2) scale(0.004, -0.004)"
+        ]
+        []
+
+
+cClef : Int -> Html msg
+cClef offset =
+    Svg.path
+        [ d """M318 0c0 -33 7 -73 45 -73c29 0 57 31 88 31c123 0 229 -89 229 -208c0 -169 -93 -250 -265 -250c-83 0 -152 61 -152 142c0 42 34 77 76 77s76 -35 76 -77c0 -39 -49 -37 -49 -76c0 -23 24 -38 49 -38c116 0 140 90 140 222c0 106 -12 180 -104 180 c-72 0 -119 -71 -119 -149c0 -9 -7 -14 -14 -14s-13 5 -13 14c0 76 -31 147 -84 200v-471c0 -6 -4 -10 -10 -10h-21c-6 0 -10 4 -10 10v980c0 6 4 10 10 10h21c6 0 10 -4 10 -10v-471c53 53 84 124 84 200c0 9 6 14 13 14s14 -5 14 -14c0 -78 47 -149 119 -149 c92 0 104 74 104 180c0 132 -24 222 -140 222c-25 0 -49 -15 -49 -38c0 -39 49 -37 49 -76c0 -42 -34 -77 -76 -77s-76 35 -76 77c0 81 69 142 152 142c172 0 265 -81 265 -250c0 -119 -106 -208 -229 -208c-31 0 -59 31 -88 31c-38 0 -45 -40 -45 -73zM129 -500h-119 c-6 0 -10 4 -10 10v980c0 6 4 10 10 10h119c6 0 10 -4 10 -10v-980c0 -6 -4 -10 -10 -10z"""
+        , fill config.color
+        , transform ("translate(8.8," ++ String.fromInt offset ++ ") scale(0.004, -0.004)")
+        ]
+        []
+
+
+altoClef : Html msg
+altoClef =
+    cClef 3
+
+
+tenorClef : Html msg
+tenorClef =
+    cClef 2
+
+
+drawClef : Clef -> Html msg
+drawClef clef =
+    case clef of
+        Treble ->
+            trebleClef
+
+        Bass ->
+            bassClef
+
+        Alto ->
+            altoClef
+
+        Tenor ->
+            tenorClef
+
+
+clefReferenceNote : Clef -> Note
+clefReferenceNote clef =
+    case clef of
+        Treble ->
+            B4
+
+        Bass ->
+            D3
+
+        Alto ->
+            C4
+
+        Tenor ->
+            A3
 
 
 staffLine : Int -> Html msg
@@ -90,9 +142,61 @@ drawKeyboardNote note accidental =
     svg [] []
 
 
-drawNote : Note -> Accidental -> Clef -> Html msg
-drawNote note accidental clef =
-    svg [] []
+drawNoteOnStaff : Note -> Accidental -> Clef -> List (Svg msg)
+drawNoteOnStaff note accidental clef =
+    let
+        offset =
+            toFloat (noteDistance (clefReferenceNote clef) note) / 2
+    in
+    [ g
+        [ id "lines", transform "translate(0,2)" ]
+        (List.map staffLine (List.range 1 5))
+    , g
+        [ id "clef", transform "translate(0,2)" ]
+        [ drawClef clef
+        ]
+    , g
+        [ id "note", transform ("translate(14," ++ String.fromFloat (2 + offset) ++ ")") ]
+        [ noteHead
+        , noteStem
+        ]
+    , g
+        [ id "legerLines", transform "translate(0,5)" ]
+        (legerLines offset)
+    ]
+
+
+legerLines : Float -> List (Svg msg)
+legerLines offset =
+    let
+        lines =
+            round offset
+    in
+    if lines > 2 then
+        List.map legerLine (List.range 2 lines)
+        |> List.drop 1
+
+    else if lines < -2 then
+        List.map legerLine (List.range lines -2)
+        |> List.reverse
+        |> List.drop 1
+
+    else
+        []
+
+
+legerLine : Int -> Html msg
+legerLine offset =
+    line
+        [ x1 "5.5"
+        , x2 "7.8"
+        , y1 "0"
+        , y2 "0"
+        , strokeWidth "0.1"
+        , stroke config.color
+        , transform ("translate(8," ++ String.fromInt offset ++ ")")
+        ]
+        []
 
 
 noteHead : Html msg
@@ -111,10 +215,42 @@ noteStem =
         [ fill config.color
         , height "3.3"
         , width "0.13"
-        , ry "0.04"
+
+        -- , ry "0.04"
         , transform "translate(1.18,-0.5)"
         ]
         []
+
+
+noteDistance : Note -> Note -> Int
+noteDistance note1 note2 =
+    noteToInt note1 - noteToInt note2
+
+
+interval : Note -> Note -> Int
+interval note1 note2 =
+    1 + noteDistance note1 note2
+
+
+type Clef
+    = Treble
+    | Bass
+    | Alto
+    | Tenor
+
+
+type Accidental
+    = Sharp
+    | Flat
+    | DoubleSharp
+    | DoubleFlat
+    | Natural
+    | NoAccidental
+
+
+type StemDirection
+    = Up
+    | Down
 
 
 type Note
@@ -163,17 +299,134 @@ type Note
     | C7
 
 
-type Clef
-    = Treble
-    | Bass
-    | Alto
-    | Tenor
+noteToInt : Note -> Int
+noteToInt note =
+    case note of
+        C1 ->
+            0
 
+        D1 ->
+            1
 
-type Accidental
-    = Sharp
-    | Flat
-    | DoubleSharp
-    | DoubleFlat
-    | Natural
-    | NoAccidental
+        E1 ->
+            2
+
+        F1 ->
+            3
+
+        G1 ->
+            4
+
+        A1 ->
+            5
+
+        B1 ->
+            6
+
+        C2 ->
+            7
+
+        D2 ->
+            8
+
+        E2 ->
+            9
+
+        F2 ->
+            10
+
+        G2 ->
+            11
+
+        A2 ->
+            12
+
+        B2 ->
+            13
+
+        C3 ->
+            14
+
+        D3 ->
+            15
+
+        E3 ->
+            16
+
+        F3 ->
+            17
+
+        G3 ->
+            18
+
+        A3 ->
+            19
+
+        B3 ->
+            20
+
+        C4 ->
+            21
+
+        D4 ->
+            22
+
+        E4 ->
+            23
+
+        F4 ->
+            24
+
+        G4 ->
+            25
+
+        A4 ->
+            26
+
+        B4 ->
+            27
+
+        C5 ->
+            28
+
+        D5 ->
+            29
+
+        E5 ->
+            30
+
+        F5 ->
+            31
+
+        G5 ->
+            32
+
+        A5 ->
+            33
+
+        B5 ->
+            34
+
+        C6 ->
+            35
+
+        D6 ->
+            36
+
+        E6 ->
+            37
+
+        F6 ->
+            38
+
+        G6 ->
+            39
+
+        A6 ->
+            40
+
+        B6 ->
+            41
+
+        C7 ->
+            42
