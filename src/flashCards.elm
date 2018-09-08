@@ -17,7 +17,7 @@ main =
             ]
             [ g
                 [ id "svgFlashCard" ]
-                (drawNoteOnStaff D3 NoAccidental Alto)
+                (drawNoteOnStaff A4 NoAccidental Treble)
             ]
         )
 
@@ -155,16 +155,19 @@ drawNoteOnStaff note accidental clef =
         [ id "clef", transform "translate(0,2)" ]
         [ drawClef clef
         ]
-    , g
-        [ id "note", transform ("translate(14," ++ String.fromFloat (2 + offset) ++ ")") ]
-        [ noteHead
-        , noteStem
-        ]
+    , drawNote offset
     , g
         [ id "legerLines", transform "translate(0,5)" ]
         (legerLines offset)
     ]
 
+drawNote : Float -> Svg msg
+drawNote offset =
+    g
+    [ id "note", transform ("translate(14," ++ String.fromFloat (2 + offset) ++ ")") ]
+    [ noteHead
+    , noteStem (if offset > -1 then Up else Down)
+    ]
 
 legerLines : Float -> List (Svg msg)
 legerLines offset =
@@ -209,17 +212,26 @@ noteHead =
         []
 
 
-noteStem : Html msg
-noteStem =
-    rect
-        [ fill config.color
-        , height "3.3"
-        , width "0.13"
-
-        -- , ry "0.04"
-        , transform "translate(1.18,-0.5)"
-        ]
-        []
+noteStem : StemDirection -> Html msg
+noteStem stemDirection =
+    case stemDirection of
+        Up ->
+            rect
+                [ fill config.color
+                , height "3.3"
+                , width "0.13"
+                , transform "translate(1.18,-0.5)"
+                ]
+                []
+        
+        Down -> 
+            rect
+                [ fill config.color
+                , height "3.3"
+                , width "0.13"
+                , transform "translate(0,3)"
+                ]
+                []
 
 
 noteDistance : Note -> Note -> Int
