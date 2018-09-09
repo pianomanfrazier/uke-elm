@@ -229,7 +229,7 @@ noteStem stemDirection =
                 [ fill config.color
                 , height "3.3"
                 , width "0.13"
-                , transform "translate(0,3)"
+                , transform "translate(0,3.2)"
                 ]
                 []
 
