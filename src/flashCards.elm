@@ -8,6 +8,15 @@ import Svg.Styled as Svg exposing (..)
 import Svg.Styled.Attributes as SSA exposing (..)
 
 
+
+-- TODO:
+-- allow users to input notes onto the staff with mouse
+-- TODO:
+-- draw piano keyboard
+-- allow users to play notes on keyboard
+-- and show them on the staff
+
+
 main =
     toUnstyled
         (svg
@@ -22,15 +31,14 @@ main =
         )
 
 
-type alias Config =
-    { color : String
-    }
-
-
 config =
     { color = "#222"
     , hoverColor = "rgba(0,0,0,0.3)"
     }
+
+
+
+-- Clefs
 
 
 trebleClef : Html msg
@@ -93,6 +101,9 @@ drawClef clef =
             tenorClef
 
 
+{-| Gets the middle line of the staff. This is used for placing notes
+on the staff relative to the reference note
+-}
 clefReferenceNote : Clef -> Note
 clefReferenceNote clef =
     case clef of
@@ -109,39 +120,16 @@ clefReferenceNote clef =
             A3
 
 
-staffLine : Int -> Html msg
-staffLine offset =
-    line
-        [ id "line1"
-        , x1 "0"
-        , x2 "12"
-        , y1 "0"
-        , y2 "0"
-        , strokeWidth "0.1"
-        , stroke config.color
-        , transform ("translate(8," ++ String.fromInt offset ++ ")")
-        ]
-        []
-
-
-
--- TODO:
--- abstract out the note, take note name as parameter
--- deduce placement on staff e.g. drawNote C4 Treble
--- when it is above the middle line flip the stem
--- draw appropriate leger lines when off the staff
--- allow users to input notes onto the staff with mouse
--- TODO:
--- draw piano keyboard
--- allow users to play notes on keyboard
--- and show them on the staff
-
-
 drawKeyboardNote : Note -> Accidental -> Html msg
 drawKeyboardNote note accidental =
     svg [] []
 
 
+{-| Draws a given note to the staff.
+
+    drawNoteOnStaff C4 Sharp Treble
+
+-}
 drawNoteOnStaff : Note -> Accidental -> Clef -> List (Svg msg)
 drawNoteOnStaff note accidental clef =
     let
@@ -161,14 +149,43 @@ drawNoteOnStaff note accidental clef =
         (legerLines offset)
     ]
 
+
+{-| Draws a single line for the staff.
+-}
+staffLine : Int -> Html msg
+staffLine offset =
+    line
+        [ id "line1"
+        , x1 "0"
+        , x2 "12"
+        , y1 "0"
+        , y2 "0"
+        , strokeWidth "0.1"
+        , stroke config.color
+        , transform ("translate(8," ++ String.fromInt offset ++ ")")
+        ]
+        []
+
+
+{-| Draws a note and determines the direction of the stem
+-}
 drawNote : Float -> Svg msg
 drawNote offset =
     g
-    [ id "note", transform ("translate(14," ++ String.fromFloat (2 + offset) ++ ")") ]
-    [ noteHead
-    , noteStem (if offset > -1 then Up else Down)
-    ]
+        [ id "note", transform ("translate(14," ++ String.fromFloat (2 + offset) ++ ")") ]
+        [ noteHead
+        , noteStem
+            (if offset > -1 then
+                Up
 
+             else
+                Down
+            )
+        ]
+
+
+{-| Draws a leger line or lines based on the offset
+-}
 legerLines : Float -> List (Svg msg)
 legerLines offset =
     let
@@ -177,17 +194,19 @@ legerLines offset =
     in
     if lines > 2 then
         List.map legerLine (List.range 2 lines)
-        |> List.drop 1
+            |> List.drop 1
 
     else if lines < -2 then
         List.map legerLine (List.range lines -2)
-        |> List.reverse
-        |> List.drop 1
+            |> List.reverse
+            |> List.drop 1
 
     else
         []
 
 
+{-| The Svg leger line
+-}
 legerLine : Int -> Html msg
 legerLine offset =
     line
@@ -212,6 +231,8 @@ noteHead =
         []
 
 
+{-| Draws the note stem given a direction
+-}
 noteStem : StemDirection -> Html msg
 noteStem stemDirection =
     case stemDirection of
@@ -223,8 +244,8 @@ noteStem stemDirection =
                 , transform "translate(1.18,-0.5)"
                 ]
                 []
-        
-        Down -> 
+
+        Down ->
             rect
                 [ fill config.color
                 , height "3.3"
@@ -242,6 +263,10 @@ noteDistance note1 note2 =
 interval : Note -> Note -> Int
 interval note1 note2 =
     1 + noteDistance note1 note2
+
+
+
+-- TYPES
 
 
 type Clef
