@@ -2,10 +2,10 @@ module Main exposing (main)
 
 import Array
 import Browser
-import Css exposing (auto, backgroundColor, center, em, fontFamilies, hex, hover, margin, marginLeft, marginRight, maxWidth, padding, px, rgb, textAlign, underline)
-import Html.Styled exposing (Html, button, div, option, select)
-import Html.Styled.Attributes as HSA exposing (css, value)
-import Html.Styled.Events as HSE exposing (onClick, onInput)
+import Css exposing (auto, inlineBlock, backgroundColor, center, em, fontFamilies, hex, hover, margin, marginLeft, marginRight, maxWidth, padding, px, rgb, textAlign, underline)
+import Html.Styled exposing (Html, button, div, input, option, select, span)
+import Html.Styled.Attributes as HSA exposing (checked, css, value)
+import Html.Styled.Events as HSE exposing (onCheck, onClick, onInput)
 import Random
 import Svg.Styled as Svg exposing (..)
 import Svg.Styled.Attributes as SSA exposing (..)
@@ -14,6 +14,10 @@ import Svg.Styled.Attributes as SSA exposing (..)
 
 -- TODO:
 -- allow users to input notes onto the staff with mouse
+-- change to Browser.application
+-- setup webpack
+-- show hint of note on keyboard
+-- checkboxes to include clefs in the random selection
 -- TODO:
 -- draw piano keyboard
 -- allow users to play notes on keyboard
@@ -38,12 +42,13 @@ type alias Model =
     { note : Note
     , accidental : Accidental
     , clef : Clef
+    , clefPool : List Clef -- clefs to generate cards from
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model C4 NoAccidental Treble, Cmd.none )
+    ( Model C4 NoAccidental Treble [ Treble, Bass ], Cmd.none )
 
 
 
@@ -54,7 +59,9 @@ type Msg
     = NewNote Int
     | GetRandomNote
     | NewClef String
-    | ToggleClef
+    | ToggleClef Int
+    | UpdateClefList String
+    | GetRandomClef
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -69,8 +76,27 @@ update msg model =
         NewClef clef ->
             ( { model | clef = clefFromString clef }, Random.generate NewNote (Random.int 0 17) )
 
-        ToggleClef ->
-            ( { model | clef = toggleClef model.clef }, Random.generate NewNote (Random.int 0 17) )
+        GetRandomClef ->
+            ( model, Random.generate ToggleClef (Random.int 0 (List.length model.clefPool - 1)) )
+
+        ToggleClef index ->
+            ( { model | clef = model.clefPool |> Array.fromList |> Array.get index |> Maybe.withDefault Treble }, Random.generate NewNote (Random.int 0 17) )
+
+        UpdateClefList clef ->
+            let
+                c =
+                    clefFromString clef
+            in
+            ( { model
+                | clefPool =
+                    if List.member c model.clefPool then
+                        List.filter (\x -> x /= c) model.clefPool
+
+                    else
+                        c :: model.clefPool
+              }
+            , Cmd.none
+            )
 
 
 toggleClef : Clef -> Clef
@@ -131,13 +157,17 @@ view model =
                     ]
                 ]
                 [ btn [ onClick GetRandomNote ] [ text "New Note" ]
-                , btn [ onClick ToggleClef ] [ text "Toggle Clef" ]
-                , select
-                    [ onInput NewClef, HSA.css [ margin (px 12), padding (px 12) ] ]
-                    [ option [ value "Treble" ] [ Html.Styled.text "Treble" ]
-                    , option [ value "Bass" ] [ Html.Styled.text "Bass" ]
-                    , option [ value "Alto" ] [ Html.Styled.text "Alto" ]
-                    , option [ value "Tenor" ] [ Html.Styled.text "Tenor" ]
+                , btn [ onClick GetRandomClef ] [ text "Toggle Clef" ]
+                , div
+                    [ HSA.css [ padding (em 1) ] ]
+                    [ input [ onInput UpdateClefList, checked (List.member Treble model.clefPool), HSA.type_ "checkbox", HSA.name "clef", HSA.value "Treble" ] []
+                    , span [] [ text "Treble" ]
+                    , input [ onInput UpdateClefList, checked (List.member Bass model.clefPool), HSA.type_ "checkbox", HSA.name "clef", HSA.value "Bass" ] []
+                    , span [] [ text "Bass" ]
+                    , input [ onInput UpdateClefList, checked (List.member Alto model.clefPool), HSA.type_ "checkbox", HSA.name "clef", HSA.value "Alto" ] []
+                    , span [] [ text "Alto" ]
+                    , input [ onInput UpdateClefList, checked (List.member Tenor model.clefPool), HSA.type_ "checkbox", HSA.name "clef", HSA.value "Tenor" ] []
+                    , span [] [ text "Tenor" ]
                     ]
                 ]
             ]
@@ -150,7 +180,14 @@ btn : List (Attribute msg) -> List (Html msg) -> Html msg
 btn =
     styled button
         [ margin (px 12)
-        , padding (px 12)
+        , padding (px 24)
+        , Css.display inlineBlock
+        , Css.border3 (px 1) Css.solid (hex "BBB")
+        , Css.cursor Css.pointer
+        , backgroundColor (hex "EEE")
+        , Css.hover [
+            backgroundColor (Css.rgba 155 155 155 0.3)
+        ]
         ]
 
 
