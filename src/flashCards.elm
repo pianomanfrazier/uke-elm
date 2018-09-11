@@ -1,8 +1,12 @@
 module Main exposing (main)
 
+import Array
 import Browser
-import Css exposing (color)
-import Html.Styled exposing (Html)
+import Css exposing (auto, backgroundColor, center, em, fontFamilies, hex, hover, margin, marginLeft, marginRight, maxWidth, padding, px, rgb, textAlign, underline)
+import Html.Styled exposing (Html, button, div, option, select)
+import Html.Styled.Attributes as HSA exposing (css, value)
+import Html.Styled.Events as HSE exposing (onClick, onInput)
+import Random
 import Svg.Styled as Svg exposing (..)
 import Svg.Styled.Attributes as SSA exposing (..)
 
@@ -31,14 +35,15 @@ main =
 
 
 type alias Model =
-    { note : ( Note, Accidental )
+    { note : Note
+    , accidental : Accidental
     , clef : Clef
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model ( C4, NoAccidental ) Treble, Cmd.none )
+    ( Model C4 NoAccidental Treble, Cmd.none )
 
 
 
@@ -46,14 +51,40 @@ init _ =
 
 
 type Msg
-    = NewNote ( Note, Accidental ) Clef
+    = NewNote Int
+    | GetRandomNote
+    | NewClef String
+    | ToggleClef
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NewNote ( note, accidental ) clef ->
-            ( { model | note = ( note, accidental ), clef = clef }, Cmd.none )
+        GetRandomNote ->
+            ( model, Random.generate NewNote (Random.int 0 17) )
+
+        NewNote index ->
+            ( { model | note = clefRange model.clef |> Array.fromList |> Array.get index |> Maybe.withDefault C4 }, Cmd.none )
+
+        NewClef clef ->
+            ( { model | clef = clefFromString clef }, Random.generate NewNote (Random.int 0 17) )
+
+        ToggleClef ->
+            ( { model | clef = toggleClef model.clef }, Random.generate NewNote (Random.int 0 17) )
+
+
+toggleClef : Clef -> Clef
+toggleClef clef =
+    case clef of
+        Treble ->
+            Bass
+
+        Bass ->
+            Treble
+
+        _ ->
+            Treble
+
 
 
 -- SUBSCRIPTIONS
@@ -64,30 +95,74 @@ subscriptions model =
     Sub.none
 
 
+
 -- VIEW
+
 
 view : Model -> Browser.Document Msg
 view model =
     { title = "Flashcards"
     , body =
         List.map toUnstyled
-            [ svg
-                [ width "90mm"
-                , viewBox "8 0 12 10"
-                , SSA.style "font-family: sans-serif; font-size: 11px;"
+            [ div
+                [ HSA.css
+                    [ marginRight auto
+                    , marginLeft auto
+                    , maxWidth (em 45)
+                    , textAlign center
+                    ]
                 ]
-                [ g
-                    [ id "svgFlashCard" ]
-                    (drawNoteOnStaff A4 NoAccidental Treble)
+                [ svg
+                    [ width "90mm"
+                    , viewBox "8 0 12 10"
+                    , SSA.style "font-family: sans-serif; font-size: 11px; max-width: 100%;"
+                    ]
+                    [ g
+                        [ id "svgFlashCard" ]
+                        (drawNoteOnStaff model.note model.accidental model.clef)
+                    ]
+                ]
+            , div
+                [ HSA.css
+                    [ marginRight auto
+                    , marginLeft auto
+                    , maxWidth (em 45)
+                    , textAlign center
+                    ]
+                ]
+                [ btn [ onClick GetRandomNote ] [ text "New Note" ]
+                , btn [ onClick ToggleClef ] [ text "Toggle Clef" ]
+                , select
+                    [ onInput NewClef, HSA.css [ margin (px 12), padding (px 12) ] ]
+                    [ option [ value "Treble" ] [ Html.Styled.text "Treble" ]
+                    , option [ value "Bass" ] [ Html.Styled.text "Bass" ]
+                    , option [ value "Alto" ] [ Html.Styled.text "Alto" ]
+                    , option [ value "Tenor" ] [ Html.Styled.text "Tenor" ]
+                    ]
                 ]
             ]
     }
 
 
+{-| A reusable button which has some styles pre-applied to it.
+-}
+btn : List (Attribute msg) -> List (Html msg) -> Html msg
+btn =
+    styled button
+        [ margin (px 12)
+        , padding (px 12)
+        ]
+
 
 config =
     { color = "#222"
     , hoverColor = "rgba(0,0,0,0.3)"
+    }
+
+
+theme =
+    { primary = hex "55af6a"
+    , secondary = rgb 250 240 230
     }
 
 
@@ -244,7 +319,7 @@ legerLines : Float -> List (Svg msg)
 legerLines offset =
     let
         lines =
-            round offset
+            truncate offset
     in
     if lines > 2 then
         List.map legerLine (List.range 2 lines)
@@ -330,6 +405,25 @@ type Clef
     | Tenor
 
 
+clefFromString : String -> Clef
+clefFromString clef =
+    case clef of
+        "Treble" ->
+            Treble
+
+        "Bass" ->
+            Bass
+
+        "Tenor" ->
+            Tenor
+
+        "Alto" ->
+            Alto
+
+        _ ->
+            Treble
+
+
 type Accidental
     = Sharp
     | Flat
@@ -388,6 +482,90 @@ type Note
     | A6
     | B6
     | C7
+
+
+clefRange : Clef -> List Note
+clefRange clef =
+    case clef of
+        Treble ->
+            [ A3
+            , B3
+            , C4
+            , D4
+            , E4
+            , F4
+            , G4
+            , A4
+            , B4
+            , C5
+            , D5
+            , E5
+            , F5
+            , G5
+            , A5
+            , B5
+            , C6
+            ]
+
+        Bass ->
+            [ C2
+            , D2
+            , E2
+            , F2
+            , G2
+            , A2
+            , B2
+            , C3
+            , D3
+            , E3
+            , F3
+            , G3
+            , A3
+            , B3
+            , C4
+            , D4
+            , E4
+            ]
+
+        Alto ->
+            [ B2
+            , C3
+            , D3
+            , E3
+            , F3
+            , G3
+            , A3
+            , B3
+            , C4
+            , D4
+            , E4
+            , F4
+            , G4
+            , A4
+            , B4
+            , C5
+            , D5
+            ]
+
+        Tenor ->
+            [ G2
+            , A2
+            , B2
+            , C3
+            , D3
+            , E3
+            , F3
+            , G3
+            , A3
+            , B3
+            , C4
+            , D4
+            , E4
+            , F4
+            , G4
+            , A4
+            , B4
+            ]
 
 
 noteToInt : Note -> Int
