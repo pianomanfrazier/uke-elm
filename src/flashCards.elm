@@ -1,7 +1,6 @@
 module Main exposing (main)
 
--- import Html exposing (Html)
-
+import Browser
 import Css exposing (color)
 import Html.Styled exposing (Html)
 import Svg.Styled as Svg exposing (..)
@@ -15,20 +14,75 @@ import Svg.Styled.Attributes as SSA exposing (..)
 -- draw piano keyboard
 -- allow users to play notes on keyboard
 -- and show them on the staff
+-- MAIN
 
 
 main =
-    toUnstyled
-        (svg
-            [ width "90mm"
-            , viewBox "8 0 12 10"
-            , SSA.style "font-family: sans-serif; font-size: 11px;"
+    Browser.document
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
+
+
+
+-- MODEL
+
+
+type alias Model =
+    { note : ( Note, Accidental )
+    , clef : Clef
+    }
+
+
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( Model ( C4, NoAccidental ) Treble, Cmd.none )
+
+
+
+-- UPDATE
+
+
+type Msg
+    = NewNote ( Note, Accidental ) Clef
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        NewNote ( note, accidental ) clef ->
+            ( { model | note = ( note, accidental ), clef = clef }, Cmd.none )
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
+-- VIEW
+
+view : Model -> Browser.Document Msg
+view model =
+    { title = "Flashcards"
+    , body =
+        List.map toUnstyled
+            [ svg
+                [ width "90mm"
+                , viewBox "8 0 12 10"
+                , SSA.style "font-family: sans-serif; font-size: 11px;"
+                ]
+                [ g
+                    [ id "svgFlashCard" ]
+                    (drawNoteOnStaff A4 NoAccidental Treble)
+                ]
             ]
-            [ g
-                [ id "svgFlashCard" ]
-                (drawNoteOnStaff A4 NoAccidental Treble)
-            ]
-        )
+    }
+
 
 
 config =
