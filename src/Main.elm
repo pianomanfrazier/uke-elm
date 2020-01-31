@@ -361,7 +361,7 @@ ukeChord chord quality =
     let
         chordLabel = if chord == Blank then "" else chordToString chord
 
-        qualityLabel = if quality == Triad then "" else qualityToString quality
+        qualityLabel = if chord == Blank || quality == Triad then "" else qualityToString quality
     in
     ukeSvg chordLabel qualityLabel (chordToList chord quality)
 
