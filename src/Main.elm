@@ -1,16 +1,16 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div, h1, h2, option, p, select, text)
+import Html exposing (Html, div, option, select, text)
 import Html.Attributes exposing (value)
 import Html.Events exposing (onInput)
-import Svg as SS exposing (Svg, circle, g, rect, style, svg, text_)
+import Svg as SS exposing (circle, g, rect, svg, text_)
 import Svg.Attributes as SSA exposing (cx, fill, height, id, r, stroke, strokeWidth, textAnchor, transform, viewBox, width, x, y)
 
 
 
 -- MAIN
--- ellie-app https://ellie-app.com/7V3KVksCKkGa1
+-- ellie-app https://ellie-app.com/7Vg6RqPbFDna1 
 
 
 main =
