@@ -179,7 +179,7 @@ chordToList chord quality =
                     [ 0, 2, 3, 2 ]
 
                 Minor ->
-                    [ 0, 2, 3, 2 ]
+                    [ 0, 2, 3, 1 ]
 
                 Dom7 ->
                     [ 0, 2, 1, 2 ]
