@@ -27,7 +27,7 @@ main =
 
 
 type alias Model =
-    { chord : Chord
+    { root : Root
     , quality : Quality
     }
 
@@ -81,7 +81,7 @@ qualityToString quality =
             "min7"
 
 
-type Chord
+type Root
     = C
     | D
     | E
@@ -91,8 +91,8 @@ type Chord
     | B
 
 
-chordList : List Chord
-chordList =
+rootList : List Root
+rootList =
     [ C, D, E, F, G, A, B ]
 
 
@@ -101,9 +101,9 @@ qualityList =
     [ Major, Minor, Dom7, Maj7, Min7 ]
 
 
-chordToList : Chord -> Quality -> List Int
-chordToList chord quality =
-    case chord of
+rootToList : Root -> Quality -> List Int
+rootToList root quality =
+    case root of
         C ->
             case quality of
                 Major ->
@@ -224,9 +224,9 @@ chordToList chord quality =
                     [ 2, 2, 2, 2 ]
 
 
-chordToString : Chord -> String
-chordToString chord =
-    case chord of
+rootToString : Root -> String
+rootToString root =
+    case root of
         C ->
             "C"
 
@@ -249,8 +249,8 @@ chordToString chord =
             "B"
 
 
-stringToChord : String -> Chord
-stringToChord string =
+stringToRoot : String -> Root
+stringToRoot string =
     case string of
         "C" ->
             C
@@ -287,15 +287,15 @@ init _ =
 
 
 type Msg
-    = ChangeChord String
+    = ChangeRoot String
     | ChangeQuality String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ChangeChord newChord ->
-            ( { model | chord = stringToChord newChord }, Cmd.none )
+        ChangeRoot newRoot ->
+            ( { model | root = stringToRoot newRoot }, Cmd.none )
 
         ChangeQuality newQuality ->
             ( { model | quality = stringToQuality newQuality }, Cmd.none )
@@ -317,21 +317,21 @@ subscriptions _ =
 view model =
     let
         optionHtml =
-            \x -> option [ value (chordToString x) ] [ text (chordToString x) ]
+            \x -> option [ value (rootToString x) ] [ text (rootToString x) ]
 
         qualityOptionHtml =
             \x -> option [ value (qualityToString x) ] [ text (qualityToString x) ]
     in
     div
-        [ SSA.class "uke-chord-container" ]
-        [ ukeChord model.chord model.quality
+        [ SSA.class "uke-root-container" ]
+        [ ukeRoot model.root model.quality
         , div
-            [ SSA.class "uke-chord-inputs" ]
+            [ SSA.class "uke-root-inputs" ]
             [ select
-                [ onInput ChangeChord ]
+                [ onInput ChangeRoot ]
                 (List.map
                     optionHtml
-                    chordList
+                    rootList
                 )
             , select
                 [ onInput ChangeQuality ]
@@ -341,22 +341,22 @@ view model =
                 )
             ]
 
-        -- , p [] [ model.chord |> chordToList |> Debug.toString |> text ]
+        -- , p [] [ model.root |> rootToList |> Debug.toString |> text ]
         ]
 
 
 
--- SVG UKE CHORD
+-- SVG UKE ROOT
 
 
-ukeChord : Chord -> Quality -> Html msg
-ukeChord chord quality =
+ukeRoot : Root -> Quality -> Html msg
+ukeRoot root quality =
     let
-        chordLabel = chordToString chord
+        rootLabel = rootToString root
 
         qualityLabel = if quality == Major then "" else qualityToString quality
     in
-    ukeSvg chordLabel qualityLabel (chordToList chord quality)
+    ukeSvg rootLabel qualityLabel (rootToList root quality)
 
 
 ukeString : Int -> Html msg
@@ -381,20 +381,20 @@ ukeSvg name quality fretList =
         -- scale the SVG
         [ width "100%"
         , viewBox "0 0 84 130"
-        , SSA.class "uke-chord-svg"
+        , SSA.class "uke-root-svg"
         ]
         [ text_
-            [ id "chordName"
+            [ id "rootName"
             , x "42"
             , y "12"
             , textAnchor "middle"
-            , SSA.class "uke-chord-name"
+            , SSA.class "uke-root-name"
             , fill "#333"
             , SSA.fontSize "12px"
             ]
             [ SS.text <| name ++ " " ++ quality ]
         , g
-            [ id "svgChord", transform "translate(9,24)" ]
+            [ id "svgRoot", transform "translate(9,24)" ]
             [ g
                 [ id "strings", transform "translate(0,2)" ]
                 (List.map ukeString [ 0, 20, 40, 60 ])
