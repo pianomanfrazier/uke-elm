@@ -1,7 +1,6 @@
 module Main exposing (main)
 
 import Browser
-import Html
 import Html exposing (Html, div, h1, h2, option, p, select, text)
 import Html.Attributes exposing (value)
 import Html.Events exposing (onInput)
@@ -29,7 +28,57 @@ main =
 
 type alias Model =
     { chord : Chord
+    , quality : Quality
     }
+
+
+type Quality
+    = Triad
+    | Minor
+    | Dom7
+    | Maj7
+    | Min7
+
+
+stringToQuality : String -> Quality
+stringToQuality quality =
+    case quality of
+        "triad" ->
+            Triad
+
+        "minor" ->
+            Minor
+
+        "7" ->
+            Dom7
+
+        "maj7" ->
+            Maj7
+
+        "min7" ->
+            Min7
+
+        _ ->
+            Triad
+
+
+qualityToString : Quality -> String
+qualityToString quality =
+    case quality of
+        Triad ->
+            "triad"
+
+        Minor ->
+            "minor"
+
+        Dom7 ->
+            "7"
+
+        Maj7 ->
+            "maj7"
+
+        Min7 ->
+            "min7"
 
 
 type Chord
@@ -40,50 +89,140 @@ type Chord
     | G
     | A
     | B
-    | G7
-    | D7
-    | A7
-    | E7
     | Blank
 
 
-chordList = [Blank, C, D, E, F, G, A, B, G7, D7, A7, E7]
+chordList : List Chord
+chordList =
+    [ Blank, C, D, E, F, G, A, B ]
 
-chordToList : Chord -> List Int
-chordToList chord =
+
+qualityList : List Quality
+qualityList =
+    [ Triad, Minor, Dom7, Maj7, Min7 ]
+
+
+chordToList : Chord -> Quality -> List Int
+chordToList chord quality =
     case chord of
         C ->
-            [ 0, 0, 0, 3 ]
+            case quality of
+                Triad ->
+                    [ 0, 0, 0, 3 ]
+
+                Minor ->
+                    [ 0, 3, 3, 3 ]
+
+                Dom7 ->
+                    [ 0, 0, 0, 1 ]
+
+                Maj7 ->
+                    [ 0, 2, 0, 0 ]
+
+                Min7 ->
+                    [ 3, 3, 3, 3 ]
 
         D ->
-            [ 2, 2, 2, 0 ]
+            case quality of
+                Triad ->
+                    [ 2, 2, 2, 0 ]
+
+                Minor ->
+                    [ 2, 2, 1, 0 ]
+
+                Dom7 ->
+                    [ 1, 0, 1, 0 ]
+
+                Maj7 ->
+                    [ 2, 2, 2, 4 ]
+
+                Min7 ->
+                    [ 2, 2, 1, 3 ]
 
         E ->
-            [ 4, 4, 4, 2 ]
+            case quality of
+                Triad ->
+                    [ 4, 4, 4, 2 ]
+
+                Minor ->
+                    [ 0, 4, 3, 2 ]
+
+                Dom7 ->
+                    [ 1, 2, 0, 2 ]
+
+                Maj7 ->
+                    [ 1, 3, 0, 2 ]
+
+                Min7 ->
+                    [ 0, 1, 0, 1 ]
 
         F ->
-            [ 2, 0, 1, 0 ]
+            case quality of
+                Triad ->
+                    [ 2, 0, 1, 0 ]
+
+                Minor ->
+                    [ 1, 0, 1, 3 ]
+
+                Dom7 ->
+                    [ 2, 3, 1, 0 ]
+
+                Maj7 ->
+                    [ 2, 4, 1, 3 ]
+
+                Min7 ->
+                    [ 1, 3, 1, 3 ]
 
         G ->
-            [ 0, 2, 3, 2 ]
+            case quality of
+                Triad ->
+                    [ 0, 2, 3, 2 ]
+
+                Minor ->
+                    [ 0, 2, 3, 2 ]
+
+                Dom7 ->
+                    [ 0, 2, 1, 2 ]
+
+                Maj7 ->
+                    [ 0, 2, 2, 2 ]
+
+                Min7 ->
+                    [ 0, 2, 1, 1 ]
 
         A ->
-            [ 2, 1, 0, 0 ]
+            case quality of
+                Triad ->
+                    [ 2, 1, 0, 0 ]
+
+                Minor ->
+                    [ 1, 0, 0, 0 ]
+
+                Dom7 ->
+                    [ 0, 1, 0, 0 ]
+
+                Maj7 ->
+                    [ 1, 1, 0, 0 ]
+
+                Min7 ->
+                    [ 0, 4, 3, 3 ]
 
         B ->
-            [ 4, 3, 2, 2 ]
+            case quality of
+                Triad ->
+                    [ 4, 3, 2, 2 ]
 
-        G7 ->
-            [ 0, 2, 1, 2 ]
+                Minor ->
+                    [ 4, 2, 2, 2 ]
 
-        D7 ->
-            [ 2, 0, 2, 0 ]
+                Dom7 ->
+                    [ 2, 3, 2, 2 ]
 
-        A7 ->
-            [ 0, 1, 0, 0 ]
+                Maj7 ->
+                    [ 3, 3, 2, 2 ]
 
-        E7 ->
-            [ 1, 2, 0, 2 ]
+                Min7 ->
+                    [ 2, 2, 2, 2 ]
 
         Blank ->
             [ 0, 0, 0, 0 ]
@@ -113,18 +252,6 @@ chordToString chord =
         B ->
             "B"
 
-        G7 ->
-            "G7"
-
-        D7 ->
-            "D7"
-
-        A7 ->
-            "A7"
-
-        E7 ->
-            "E7"
-
         Blank ->
             "None"
 
@@ -153,25 +280,13 @@ stringToChord string =
         "B" ->
             B
 
-        "G7" ->
-            G7
-
-        "D7" ->
-            D7
-
-        "A7" ->
-            A7
-
-        "E7" ->
-            E7
-
         _ ->
             Blank
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model Blank, Cmd.none )
+    ( Model Blank Triad, Cmd.none )
 
 
 
@@ -180,6 +295,7 @@ init _ =
 
 type Msg
     = ChangeChord String
+    | ChangeQuality String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -188,13 +304,16 @@ update msg model =
         ChangeChord newChord ->
             ( { model | chord = stringToChord newChord }, Cmd.none )
 
+        ChangeQuality newQuality ->
+            ( { model | quality = stringToQuality newQuality }, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -204,17 +323,31 @@ subscriptions model =
 
 view model =
     let
-        optionHtml = \x -> option [ value (chordToString x) ] [ text (chordToString x)]
+        optionHtml =
+            \x -> option [ value (chordToString x) ] [ text (chordToString x) ]
+
+        qualityOptionHtml =
+            \x -> option [ value (qualityToString x) ] [ text (qualityToString x) ]
     in
     div
         [ SSA.class "uke-chord-container" ]
-        [ div [] [ ukeChord model.chord ]
-        , select
-            [ onInput ChangeChord ]
-            (List.map
-                optionHtml
-                chordList
-            )
+        [ ukeChord model.chord model.quality
+        , div
+            [ SSA.class "uke-chord-inputs" ]
+            [ select
+                [ onInput ChangeChord ]
+                (List.map
+                    optionHtml
+                    chordList
+                )
+            , select
+                [ onInput ChangeQuality ]
+                (List.map
+                    qualityOptionHtml
+                    qualityList
+                )
+            ]
+
         -- , p [] [ model.chord |> chordToList |> Debug.toString |> text ]
         ]
 
@@ -223,9 +356,14 @@ view model =
 -- SVG UKE CHORD
 
 
-ukeChord : Chord -> Html msg
-ukeChord chord =
-    ukeSvg (chordToString chord) (chordToList chord)
+ukeChord : Chord -> Quality -> Html msg
+ukeChord chord quality =
+    let
+        chordLabel = if chord == Blank then "" else chordToString chord
+
+        qualityLabel = if quality == Triad then "" else qualityToString quality
+    in
+    ukeSvg chordLabel qualityLabel (chordToList chord quality)
 
 
 ukeString : Int -> Html msg
@@ -244,8 +382,8 @@ ukeFret index fret =
             rect [ height "2", width "62", y (String.fromInt fret), fill "#333" ] []
 
 
-ukeSvg : String -> List Int -> Html msg
-ukeSvg name fretList =
+ukeSvg : String -> String -> List Int -> Html msg
+ukeSvg name quality fretList =
     svg
         -- scale the SVG
         [ width "100%"
@@ -259,8 +397,9 @@ ukeSvg name fretList =
             , textAnchor "middle"
             , SSA.class "uke-chord-name"
             , fill "#333"
+            , SSA.fontSize "12px"
             ]
-            [ SS.text name ]
+            [ SS.text <| name ++ " " ++ quality ]
         , g
             [ id "svgChord", transform "translate(9,24)" ]
             [ g
