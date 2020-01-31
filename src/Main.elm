@@ -215,7 +215,7 @@ view model =
                 optionHtml
                 chordList
             )
-        , p [] [ model.chord |> chordToList |> Debug.toString |> text ]
+        -- , p [] [ model.chord |> chordToList |> Debug.toString |> text ]
         ]
 
 
@@ -248,8 +248,7 @@ ukeSvg : String -> List Int -> Html msg
 ukeSvg name fretList =
     svg
         -- scale the SVG
-        [ floor (84 * 1.7) |> String.fromInt |> width
-        , floor (130 * 1.7) |> String.fromInt |> height
+        [ width "100%"
         , viewBox "0 0 84 130"
         , SSA.class "uke-chord-svg"
         ]
