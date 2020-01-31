@@ -33,7 +33,7 @@ type alias Model =
 
 
 type Quality
-    = Triad
+    = Major
     | Minor
     | Dom7
     | Maj7
@@ -43,8 +43,8 @@ type Quality
 stringToQuality : String -> Quality
 stringToQuality quality =
     case quality of
-        "triad" ->
-            Triad
+        "Major" ->
+            Major
 
         "minor" ->
             Minor
@@ -59,14 +59,14 @@ stringToQuality quality =
             Min7
 
         _ ->
-            Triad
+            Major
 
 
 qualityToString : Quality -> String
 qualityToString quality =
     case quality of
-        Triad ->
-            "triad"
+        Major ->
+            "Major"
 
         Minor ->
             "minor"
@@ -89,17 +89,16 @@ type Chord
     | G
     | A
     | B
-    | Blank
 
 
 chordList : List Chord
 chordList =
-    [ Blank, C, D, E, F, G, A, B ]
+    [ C, D, E, F, G, A, B ]
 
 
 qualityList : List Quality
 qualityList =
-    [ Triad, Minor, Dom7, Maj7, Min7 ]
+    [ Major, Minor, Dom7, Maj7, Min7 ]
 
 
 chordToList : Chord -> Quality -> List Int
@@ -107,7 +106,7 @@ chordToList chord quality =
     case chord of
         C ->
             case quality of
-                Triad ->
+                Major ->
                     [ 0, 0, 0, 3 ]
 
                 Minor ->
@@ -124,7 +123,7 @@ chordToList chord quality =
 
         D ->
             case quality of
-                Triad ->
+                Major ->
                     [ 2, 2, 2, 0 ]
 
                 Minor ->
@@ -141,7 +140,7 @@ chordToList chord quality =
 
         E ->
             case quality of
-                Triad ->
+                Major ->
                     [ 4, 4, 4, 2 ]
 
                 Minor ->
@@ -158,7 +157,7 @@ chordToList chord quality =
 
         F ->
             case quality of
-                Triad ->
+                Major ->
                     [ 2, 0, 1, 0 ]
 
                 Minor ->
@@ -175,7 +174,7 @@ chordToList chord quality =
 
         G ->
             case quality of
-                Triad ->
+                Major ->
                     [ 0, 2, 3, 2 ]
 
                 Minor ->
@@ -192,7 +191,7 @@ chordToList chord quality =
 
         A ->
             case quality of
-                Triad ->
+                Major ->
                     [ 2, 1, 0, 0 ]
 
                 Minor ->
@@ -209,7 +208,7 @@ chordToList chord quality =
 
         B ->
             case quality of
-                Triad ->
+                Major ->
                     [ 4, 3, 2, 2 ]
 
                 Minor ->
@@ -223,9 +222,6 @@ chordToList chord quality =
 
                 Min7 ->
                     [ 2, 2, 2, 2 ]
-
-        Blank ->
-            [ 0, 0, 0, 0 ]
 
 
 chordToString : Chord -> String
@@ -251,9 +247,6 @@ chordToString chord =
 
         B ->
             "B"
-
-        Blank ->
-            "None"
 
 
 stringToChord : String -> Chord
@@ -281,12 +274,12 @@ stringToChord string =
             B
 
         _ ->
-            Blank
+            C
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model Blank Triad, Cmd.none )
+    ( Model C Major, Cmd.none )
 
 
 
@@ -359,9 +352,9 @@ view model =
 ukeChord : Chord -> Quality -> Html msg
 ukeChord chord quality =
     let
-        chordLabel = if chord == Blank then "" else chordToString chord
+        chordLabel = chordToString chord
 
-        qualityLabel = if chord == Blank || quality == Triad then "" else qualityToString quality
+        qualityLabel = if quality == Major then "" else qualityToString quality
     in
     ukeSvg chordLabel qualityLabel (chordToList chord quality)
 
