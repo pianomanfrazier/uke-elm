@@ -1,17 +1,17 @@
 module Main exposing (main)
 
 import Browser
-import Css exposing (fontFamily, sansSerif, fontSize, px, em, padding, auto, solid, hex)
 import Html
-import Html.Styled exposing (Html, div, h1, h2, option, p, select, styled, text, toUnstyled)
-import Html.Styled.Attributes exposing (css, value)
-import Html.Styled.Events exposing (onInput)
-import Svg.Styled as SS exposing (Svg, circle, fromUnstyled, g, rect, style, svg, text_)
-import Svg.Styled.Attributes as SSA exposing (cx, fill, height, id, r, stroke, strokeWidth, textAnchor, transform, viewBox, width, x, y)
+import Html exposing (Html, div, h1, h2, option, p, select, text)
+import Html.Attributes exposing (value)
+import Html.Events exposing (onInput)
+import Svg as SS exposing (Svg, circle, g, rect, style, svg, text_)
+import Svg.Attributes as SSA exposing (cx, fill, height, id, r, stroke, strokeWidth, textAnchor, transform, viewBox, width, x, y)
 
 
 
 -- MAIN
+-- ellie-app https://ellie-app.com/7V3KVksCKkGa1
 
 
 main =
@@ -34,11 +34,20 @@ type alias Model =
 
 type Chord
     = C
+    | D
+    | E
     | F
-    | G7
     | G
+    | A
+    | B
+    | G7
+    | D7
+    | A7
+    | E7
     | Blank
 
+
+chordList = [Blank, C, D, E, F, G, A, B, G7, D7, A7, E7]
 
 chordToList : Chord -> List Int
 chordToList chord =
@@ -46,16 +55,37 @@ chordToList chord =
         C ->
             [ 0, 0, 0, 3 ]
 
+        D ->
+            [ 2, 2, 2, 0 ]
+
+        E ->
+            [ 4, 4, 4, 2 ]
+
         F ->
             [ 2, 0, 1, 0 ]
-
-        G7 ->
-            [ 0, 2, 1, 2 ]
 
         G ->
             [ 0, 2, 3, 2 ]
 
-        _ ->
+        A ->
+            [ 2, 1, 0, 0 ]
+
+        B ->
+            [ 4, 3, 2, 2 ]
+
+        G7 ->
+            [ 0, 2, 1, 2 ]
+
+        D7 ->
+            [ 2, 0, 2, 0 ]
+
+        A7 ->
+            [ 0, 1, 0, 0 ]
+
+        E7 ->
+            [ 1, 2, 0, 2 ]
+
+        Blank ->
             [ 0, 0, 0, 0 ]
 
 
@@ -65,16 +95,37 @@ chordToString chord =
         C ->
             "C"
 
+        D ->
+            "D"
+
+        E ->
+            "E"
+
         F ->
             "F"
-
-        G7 ->
-            "G7"
 
         G ->
             "G"
 
-        _ ->
+        A ->
+            "A"
+
+        B ->
+            "B"
+
+        G7 ->
+            "G7"
+
+        D7 ->
+            "D7"
+
+        A7 ->
+            "A7"
+
+        E7 ->
+            "E7"
+
+        Blank ->
             "None"
 
 
@@ -84,14 +135,35 @@ stringToChord string =
         "C" ->
             C
 
+        "D" ->
+            D
+
+        "E" ->
+            E
+
         "F" ->
             F
+
+        "G" ->
+            G
+
+        "A" ->
+            A
+
+        "B" ->
+            B
 
         "G7" ->
             G7
 
-        "G" ->
-            G
+        "D7" ->
+            D7
+
+        "A7" ->
+            A7
+
+        "E7" ->
+            E7
 
         _ ->
             Blank
@@ -131,21 +203,20 @@ subscriptions model =
 
 
 view model =
-        toUnstyled
-            (div
-                []
-                [ div [] [ ukeChord model.chord ]
-                , select
-                    [ onInput ChangeChord ]
-                    [ option [ value "NONE" ] [ Html.Styled.text "No Chord" ]
-                    , option [ value "C" ] [ Html.Styled.text "C chord" ]
-                    , option [ value "F" ] [ Html.Styled.text "F chord" ]
-                    , option [ value "G" ] [ Html.Styled.text "G chord" ]
-                    , option [ value "G7" ] [ Html.Styled.text "G7 chord" ]
-                    ]
-                -- , p [] [ model.chord |> chordToList |> Debug.toString |> Html.Styled.text ]
-                ]
+    let
+        optionHtml = \x -> option [ value (chordToString x) ] [ text (chordToString x)]
+    in
+    div
+        [ SSA.class "uke-chord-container" ]
+        [ div [] [ ukeChord model.chord ]
+        , select
+            [ onInput ChangeChord ]
+            (List.map
+                optionHtml
+                chordList
             )
+        , p [] [ model.chord |> chordToList |> Debug.toString |> text ]
+        ]
 
 
 
@@ -174,24 +245,20 @@ ukeFret index fret =
 
 
 ukeSvg : String -> List Int -> Html msg
-ukeSvg name chordList =
+ukeSvg name fretList =
     svg
         -- scale the SVG
         [ floor (84 * 1.7) |> String.fromInt |> width
         , floor (130 * 1.7) |> String.fromInt |> height
         , viewBox "0 0 84 130"
-        , SSA.css
-            [ fontFamily sansSerif
-            , fontSize (px 14)
-            ]
+        , SSA.class "uke-chord-svg"
         ]
         [ text_
             [ id "chordName"
             , x "42"
             , y "12"
             , textAnchor "middle"
-            , SSA.css
-                [ fontSize (px 16) ]
+            , SSA.class "uke-chord-name"
             , fill "#333"
             ]
             [ SS.text name ]
@@ -205,10 +272,10 @@ ukeSvg name chordList =
                 (List.indexedMap ukeFret [ 0, 20, 40, 60, 80, 100 ])
             , g
                 [ id "closedStrings", transform "translate(1,12)" ]
-                (List.indexedMap closedCircle chordList)
+                (List.indexedMap closedCircle fretList)
             , g
                 [ id "openStrings", transform "translate(1,-5)" ]
-                (List.indexedMap openCircle chordList)
+                (List.indexedMap openCircle fretList)
             ]
         ]
 
