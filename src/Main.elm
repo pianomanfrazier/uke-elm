@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Css exposing (..)
+import Css exposing (fontFamily, sansSerif, fontSize, px, em, padding, auto, solid, hex)
 import Html
 import Html.Styled exposing (Html, div, h1, h2, option, p, select, styled, text, toUnstyled)
 import Html.Styled.Attributes exposing (css, value)
@@ -15,7 +15,7 @@ import Svg.Styled.Attributes as SSA exposing (cx, fill, height, id, r, stroke, s
 
 
 main =
-    Browser.document
+    Browser.element
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -130,28 +130,11 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Browser.Document Msg
 view model =
-    { title = "Uke Chord Viewer"
-    , body =
-        List.map toUnstyled
-            [ div
-                [ css
-                    [ padding (em 1)
-                    , borderRadius (px 5)
-                    , marginTop (em 5)
-                    , marginLeft auto
-                    , marginRight auto
-                    , border3 (px 2) solid (hex "777")
-                    , textAlign center
-                    , maxWidth (em 30)
-                    , fontFamilies [ "Roboto", "Open Sans", "sans-serif" ]
-                    , color (hex "222")
-                    , backgroundColor (hex "F4EEE2")
-                    ]
-                ]
-                [ h1 [] [ Html.Styled.text "Uke Chord Viewer" ]
-                , div [] [ ukeChord model.chord ]
+        toUnstyled
+            (div
+                []
+                [ div [] [ ukeChord model.chord ]
                 , select
                     [ onInput ChangeChord ]
                     [ option [ value "NONE" ] [ Html.Styled.text "No Chord" ]
@@ -162,8 +145,7 @@ view model =
                     ]
                 -- , p [] [ model.chord |> chordToList |> Debug.toString |> Html.Styled.text ]
                 ]
-            ]
-    }
+            )
 
 
 
