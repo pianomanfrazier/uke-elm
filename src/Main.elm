@@ -10,7 +10,7 @@ import Svg.Attributes as SSA exposing (cx, fill, height, id, r, stroke, strokeWi
 
 
 -- MAIN
--- ellie-app https://ellie-app.com/7Vg6RqPbFDna1 
+-- ellie-app https://ellie-app.com/7VhStTx7rw7a1 
 
 
 main =
@@ -323,10 +323,10 @@ view model =
             \x -> option [ value (qualityToString x) ] [ text (qualityToString x) ]
     in
     div
-        [ SSA.class "uke-root-container" ]
+        [ SSA.class "uke-chord-container" ]
         [ ukeRoot model.root model.quality
         , div
-            [ SSA.class "uke-root-inputs" ]
+            [ SSA.class "uke-chord-inputs" ]
             [ select
                 [ onInput ChangeRoot ]
                 (List.map
@@ -352,9 +352,15 @@ view model =
 ukeRoot : Root -> Quality -> Html msg
 ukeRoot root quality =
     let
-        rootLabel = rootToString root
+        rootLabel =
+            rootToString root
 
-        qualityLabel = if quality == Major then "" else qualityToString quality
+        qualityLabel =
+            if quality == Major then
+                ""
+
+            else
+                qualityToString quality
     in
     ukeSvg rootLabel qualityLabel (rootToList root quality)
 
@@ -381,20 +387,20 @@ ukeSvg name quality fretList =
         -- scale the SVG
         [ width "100%"
         , viewBox "0 0 84 130"
-        , SSA.class "uke-root-svg"
+        , SSA.class "uke-chord-svg"
         ]
         [ text_
-            [ id "rootName"
+            [ id "chordName"
             , x "42"
             , y "12"
             , textAnchor "middle"
-            , SSA.class "uke-root-name"
+            , SSA.class "uke-chord-name"
             , fill "#333"
             , SSA.fontSize "12px"
             ]
             [ SS.text <| name ++ " " ++ quality ]
         , g
-            [ id "svgRoot", transform "translate(9,24)" ]
+            [ id "svgChord", transform "translate(9,24)" ]
             [ g
                 [ id "strings", transform "translate(0,2)" ]
                 (List.map ukeString [ 0, 20, 40, 60 ])
